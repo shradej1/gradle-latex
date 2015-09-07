@@ -1,0 +1,45 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'idea'
+
+group 'shradej1.plugins'
+version '1.0-SNAPSHOT'
+
+idea {
+    module {
+       downloadJavadoc = true
+       downloadSources = true
+    }
+}
+
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+// TODO: See https://docs.gradle.org/2.6/userguide/test_kit.html, 51.2.1 Getting the code under test into the test build
+// When a better approach exists, replace this
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+ideaModule.dependsOn createClasspathManifest
+
+dependencies {
+    compile gradleApi()
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.3'
+    testCompile gradleTestKit()
+
+    // TODO: Remove when better approach for getting code under test into build exists
+    testRuntime files(createClasspathManifest)
+}

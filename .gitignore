@@ -1,0 +1,11 @@
+# Build directories
+out/
+build/
+
+# Gradle
+.gradle
+
+# IntelliJ
+*.ipr
+*.iws
+*.iml
